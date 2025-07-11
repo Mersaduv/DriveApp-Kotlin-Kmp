@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "794608952690",
+    "project_id": "maidriveapp-f4ff3",
+    "storage_bucket": "maidriveapp-f4ff3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794608952690:android:5f5b12e889c13ac22969eb",
+        "android_client_info": {
+          "package_name": "com.mai.driveapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDC8AFJp8FvGrQ9qqI072ynF2D-xRvIL4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

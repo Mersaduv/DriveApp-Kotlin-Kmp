@@ -38,28 +38,31 @@ class MainActivity : ComponentActivity() {
             val isLoggedIn by sessionManager.isLoggedIn.collectAsState()
             val needsRegistration by sessionManager.needsRegistration.collectAsState()
             
-            DriveAppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    if (isLoggedIn && !needsRegistration) {
-                        // User is fully logged in, show main app
-                        MainNavGraph(
-                            onLogout = {
-                                sessionManager.logout()
-                            }
-                        )
-                    } else {
-                        // User needs authentication or registration completion
-                        AuthNavGraph(
-                            sessionManager = sessionManager,
-                            onAuthenticationComplete = {
-                                // این تابع فقط زمانی صدا زده می‌شود که کاربر کاملاً ثبت‌نام کرده باشد
-                                // اطمینان حاصل می‌کنیم که فرآیند ثبت‌نام کامل شده است
-                                sessionManager.completeRegistration()
-                            }
-                        )
+            // Provide the language manager to the composition
+            ProvideLanguageManager {
+                DriveAppTheme {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        if (isLoggedIn && !needsRegistration) {
+                            // User is fully logged in, show main app
+                            MainNavGraph(
+                                onLogout = {
+                                    sessionManager.logout()
+                                }
+                            )
+                        } else {
+                            // User needs authentication or registration completion
+                            AuthNavGraph(
+                                sessionManager = sessionManager,
+                                onAuthenticationComplete = {
+                                    // این تابع فقط زمانی صدا زده می‌شود که کاربر کاملاً ثبت‌نام کرده باشد
+                                    // اطمینان حاصل می‌کنیم که فرآیند ثبت‌نام کامل شده است
+                                    sessionManager.completeRegistration()
+                                }
+                            )
+                        }
                     }
                 }
             }

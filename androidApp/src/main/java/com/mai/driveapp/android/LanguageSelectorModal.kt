@@ -4,6 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +26,9 @@ fun LanguageSelectorModal(
     onLanguageSelected: (Language) -> Unit
 ) {
     if (isVisible) {
+        // Use temporary state for language selection
+        var selectedLanguage by remember { mutableStateOf(currentLanguage) }
+        
         ModalBottomSheet(
             onDismissRequest = onDismiss,
             shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
@@ -63,23 +70,27 @@ fun LanguageSelectorModal(
                 // Language options
                 LanguageOption(
                     language = Language.ENGLISH,
-                    isSelected = currentLanguage == Language.ENGLISH,
-                    onSelect = { onLanguageSelected(Language.ENGLISH) }
+                    isSelected = selectedLanguage == Language.ENGLISH,
+                    onSelect = { selectedLanguage = Language.ENGLISH }
                 )
                 
                 Divider(modifier = Modifier.padding(vertical = 8.dp))
                 
                 LanguageOption(
                     language = Language.PERSIAN,
-                    isSelected = currentLanguage == Language.PERSIAN,
-                    onSelect = { onLanguageSelected(Language.PERSIAN) }
+                    isSelected = selectedLanguage == Language.PERSIAN,
+                    onSelect = { selectedLanguage = Language.PERSIAN }
                 )
                 
                 Spacer(modifier = Modifier.height(24.dp))
                 
                 // Submit button
                 Button(
-                    onClick = onDismiss,
+                    onClick = { 
+                        // Apply language change only when button is clicked
+                        onLanguageSelected(selectedLanguage)
+                        onDismiss() 
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -105,24 +116,36 @@ fun LanguageOption(
     isSelected: Boolean,
     onSelect: () -> Unit
 ) {
-    Row(
+    // Make entire row clickable
+    Card(
+        onClick = onSelect,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.surfaceVariant 
+                            else MaterialTheme.colorScheme.surface
+        )
     ) {
-        Text(
-            text = language.displayName,
-            fontSize = 18.sp
-        )
-        
-        RadioButton(
-            selected = isSelected,
-            onClick = onSelect,
-            colors = RadioButtonDefaults.colors(
-                selectedColor = MaterialTheme.colorScheme.primary
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = language.displayName,
+                fontSize = 18.sp
             )
-        )
+            
+            RadioButton(
+                selected = isSelected,
+                onClick = null, // The onClick is handled by the Card
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
     }
 } 

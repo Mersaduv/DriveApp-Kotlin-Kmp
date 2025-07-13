@@ -5,7 +5,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
+import com.mai.driveapp.Language
 
 private val LightColors = lightColorScheme(
     primary = Color(0xFF1E88E5),       // Blue 600
@@ -64,8 +69,17 @@ fun DriveAppTheme(
 ) {
     val colorScheme = if (useDarkTheme) DarkColors else LightColors
     
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content
-    )
+    // Get current language to set layout direction
+    val languageManager = LocalLanguageManager.current
+    val currentLanguage by languageManager.languageState
+    
+    // Set layout direction based on language
+    val layoutDirection = if (currentLanguage.isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
+    
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            content = content
+        )
+    }
 } 

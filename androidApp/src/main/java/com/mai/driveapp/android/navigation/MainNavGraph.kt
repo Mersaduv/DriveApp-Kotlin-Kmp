@@ -54,7 +54,7 @@ fun HomeScreen(onLogout: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "به تاپرو خوش آمدید",
+                text = "به تاپی خوش آمدید",
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center
             )

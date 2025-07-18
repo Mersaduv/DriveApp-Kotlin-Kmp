@@ -57,7 +57,7 @@ class AuthRepository(
         
         return try {
             val response = authService.verifyCode(phoneNumber, code).getOrThrow()
-            
+            println("verifyCode:")
             if (response.success) {
                 // Store auth data in session manager
                 sessionManager.saveAuthData(
@@ -65,16 +65,22 @@ class AuthRepository(
                     response.user,
                     response.userType
                 )
-                
+ 
+                println("[AuthRepository] verifyCode: requiresRegistration=${response.requiresRegistration}")
+
                 // Store verification data for registration completion
-                sessionManager.saveVerificationData(phoneNumber, response.userId)
+                if (response.requiresRegistration) {
+                    sessionManager.saveVerificationData(phoneNumber, response.userId)
+                }
                 
                 // Return whether registration is required
                 Result.success(response.requiresRegistration)
             } else {
+                println("verifyCode:")
                 Result.failure(Exception(response.message))
             }
         } catch (e: Exception) {
+            println("verifyCode:")
             Result.failure(e)
         }
     }
@@ -82,14 +88,12 @@ class AuthRepository(
     /**
      * Complete the registration by providing user details
      * 
-     * @param firstName User's first name
-     * @param lastName User's last name (optional)
+     * @param fullName User's first name
      * @param email User's email (optional)
      * @return A result indicating success or failure
      */
     suspend fun completeRegistration(
-        firstName: String,
-        lastName: String? = null,
+        fullName: String,
         email: String? = null
     ): Result<Boolean> {
         val userId = sessionManager.getVerificationUserId()
@@ -98,17 +102,16 @@ class AuthRepository(
         val phoneNumber = sessionManager.getVerificationPhoneNumber()
             ?: return Result.failure(Exception("شماره تلفن یافت نشد. لطفاً دوباره وارد شوید."))
         
-        // Validate first name
-        if (firstName.isBlank()) {
-            return Result.failure(Exception("نام نمی‌تواند خالی باشد."))
+        // Validate full name
+        if (fullName.isBlank()) {
+            return Result.failure(Exception("نام و نام خانوادگی نمی‌تواند خالی باشد."))
         }
         
         return try {
             val response = authService.completeRegistration(
                 userId = userId,
                 phoneNumber = phoneNumber,
-                firstName = firstName,
-                lastName = lastName,
+                fullName = fullName,
                 email = email
             ).getOrThrow()
             

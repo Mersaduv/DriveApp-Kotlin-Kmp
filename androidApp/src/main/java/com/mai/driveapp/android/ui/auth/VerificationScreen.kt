@@ -93,53 +93,8 @@ fun VerificationScreen(
         // 1. با استفاده از پرچم shouldNavigateToRegistration از ViewModel
         LaunchedEffect(shouldNavigateToRegistration) {
             if (shouldNavigateToRegistration) {
-                navigateTriggered = true
                 onNavigateToRegistration()
-                viewModel.onNavigationComplete()
             }
-        }
-        
-        // 2. با استفاده از وضعیت UI
-        LaunchedEffect(uiState) {
-            when (uiState) {
-                is VerificationUiState.Success -> {
-                    // برای اطمینان از عدم انتقال مکرر
-                    if (!navigateTriggered) {
-                        delay(800) // تاخیر کوتاه
-                        navigateTriggered = true
-                        onNavigateToRegistration()
-                    }
-                }
-                is VerificationUiState.Error -> {
-                    errorMessage = (uiState as VerificationUiState.Error).message
-                    showError = true
-                    delay(3000) // Hide error after 3 seconds
-                    showError = false
-                }
-                else -> {
-                    showError = false
-                }
-            }
-        }
-        
-        // 3. تلاش دوباره پس از مدتی کوتاه اگر وضعیت Success باشد
-        LaunchedEffect(navigateTriggered, uiState) {
-            if (uiState is VerificationUiState.Success && !navigateTriggered) {
-                delay(1500) // تاخیر طولانی‌تر برای آخرین تلاش
-                if (!navigateTriggered && uiState is VerificationUiState.Success) {
-                    navigateTriggered = true
-                    viewModel.forceNavigateToRegistration()
-                    onNavigateToRegistration()
-                }
-            }
-        }
-        
-        // برای اطمینان از عملکرد صحیح
-        DisposableEffect(uiState) {
-            if (uiState is VerificationUiState.Success && !navigateTriggered) {
-                viewModel.forceNavigateToRegistration()
-            }
-            onDispose { }
         }
         
         Box(modifier = Modifier.fillMaxSize()) {

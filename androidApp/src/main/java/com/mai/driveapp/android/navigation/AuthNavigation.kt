@@ -60,38 +60,31 @@ fun AuthNavGraph(
             val viewModel = koinViewModel<VerificationViewModel>()
             val uiState by viewModel.uiState.collectAsState()
             val shouldNavigate by viewModel.shouldNavigateToRegistration.collectAsState()
-            
-            // راه‌حل 1: بررسی وضعیت موفقیت برای هدایت به صفحه ثبت‌نام
-            LaunchedEffect(uiState) {
-                if (uiState is VerificationUiState.Success) {
-                    delay(500)  // تاخیر کوتاه برای اطمینان از تکمیل فرآیندهای قبلی
-                    navController.navigate(AuthDestinations.REGISTRATION) {
-                        popUpTo(AuthDestinations.VERIFICATION_ROUTE_WITH_CODE) { inclusive = true }
-                    }
-                }
-            }
-            
-            // راه‌حل 2: استفاده از پرچم برای هدایت به صفحه ثبت‌نام
-            LaunchedEffect(shouldNavigate) {
-                if (shouldNavigate) {
-                    navController.navigate(AuthDestinations.REGISTRATION) {
-                        popUpTo(AuthDestinations.VERIFICATION_ROUTE_WITH_CODE) { inclusive = true }
-                    }
-                    viewModel.onNavigationComplete()
+            // If verification is successful and registration not required, finish auth flow
+            LaunchedEffect(uiState, shouldNavigate) {
+                if (uiState is VerificationUiState.Success && !shouldNavigate) {
+                    println("[AuthNavigation] existing user verified - completing auth flow")
+                    onAuthenticationComplete()
                 }
             }
 
-            // راه‌حل 3: بررسی وضعیت کاربر برای تعیین مرحله بعدی
-            LaunchedEffect(Unit) {
-                // اگر کاربر به اشتباه به این صفحه آمده و قبلاً نیاز به تکمیل ثبت‌نام دارد، مستقیم هدایت کن
-                val userId = sessionManager.getVerificationUserId()
-                if (userId != null) {
+            // راه‌حل 2: استفاده از پرچم برای هدایت به صفحه ثبت‌نام
+            LaunchedEffect(shouldNavigate) {
+                println("[AuthNavigation] shouldNavigate=$shouldNavigate")
+                if (shouldNavigate) {
                     navController.navigate(AuthDestinations.REGISTRATION) {
-                        popUpTo(AuthDestinations.VERIFICATION_ROUTE_WITH_CODE) { inclusive = true }
+                        popUpTo(AuthDestinations.PHONE_NUMBER) { inclusive = false }
+                        launchSingleTop = true
                     }
+                    println("[AuthNavigation] navigated to RegistrationScreen")
                 }
             }
+
+            // بررسی کاربر جدید به عهدهٔ فلگ shouldNavigate واگذار شده است.
             
+            // پایان احراز هویت در صورت عدم نیاز به ثبت‌نام
+            // اگر نیاز به ثبت‌نام نبود، خروج از فلو احراز هویت در خود VerificationScreen انجام می‌شود؛ این افکت حذف شد.
+
             VerificationScreen(
                 viewModel = viewModel,
                 prefillCode = code,

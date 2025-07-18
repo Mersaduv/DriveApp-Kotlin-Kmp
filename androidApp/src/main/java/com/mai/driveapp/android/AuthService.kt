@@ -67,14 +67,9 @@ class AuthService : KoinComponent {
      * Create profile with user's name
      */
     suspend fun createProfile(sessionId: String, fullName: String): CreateProfileResponse = withContext(Dispatchers.IO) {
-        val names = fullName.split(" ", limit = 2)
-        val firstName = names.first()
-        val lastName = if (names.size > 1) names.last() else null
-        
         // Use real API
         val result = authRepository.completeRegistration(
-            firstName = firstName,
-            lastName = lastName
+            fullName = fullName
         )
         
         return@withContext result.fold(

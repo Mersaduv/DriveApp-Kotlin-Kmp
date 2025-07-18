@@ -37,8 +37,6 @@ fun RegistrationScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val firstName by viewModel.firstName.collectAsState()
-    val lastName by viewModel.lastName.collectAsState()
-    val email by viewModel.email.collectAsState()
     
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
@@ -103,7 +101,7 @@ fun RegistrationScreen(
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(
-                text = LocalizedStrings.enterNameInstruction,
+                text = LocalizedStrings.enterFullName,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp)
@@ -115,7 +113,7 @@ fun RegistrationScreen(
             OutlinedTextField(
                 value = firstName,
                 onValueChange = { viewModel.updateFirstName(it) },
-                label = { Text(LocalizedStrings.firstNameLabel) },
+                label = { Text(LocalizedStrings.fullName) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -126,42 +124,7 @@ fun RegistrationScreen(
                     focusedLabelColor = MaterialTheme.colorScheme.primary
                 )
             )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Last name input (optional)
-            OutlinedTextField(
-                value = lastName,
-                onValueChange = { viewModel.updateLastName(it) },
-                label = { Text(LocalizedStrings.lastNameLabel) },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary
-                )
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Email input (optional)
-            OutlinedTextField(
-                value = email,
-                onValueChange = { viewModel.updateEmail(it) },
-                label = { Text(LocalizedStrings.emailOptionalLabel) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary
-                )
-            )
-            
+
             Spacer(modifier = Modifier.height(32.dp))
             
             // Submit button

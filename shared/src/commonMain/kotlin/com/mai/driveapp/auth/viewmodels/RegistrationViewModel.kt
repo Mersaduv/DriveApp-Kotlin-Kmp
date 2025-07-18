@@ -54,7 +54,7 @@ class RegistrationViewModel(private val authRepository: AuthRepository) : ViewMo
         val firstName = _firstName.value.trim()
         
         if (firstName.isEmpty()) {
-            _uiState.value = RegistrationUiState.Error("نام نمی‌تواند خالی باشد.")
+            _uiState.value = RegistrationUiState.Error("نام و نام خانوادگی نمی‌تواند خالی باشد.")
             return
         }
         
@@ -62,8 +62,7 @@ class RegistrationViewModel(private val authRepository: AuthRepository) : ViewMo
         
         viewModelScope.launch {
             val result = authRepository.completeRegistration(
-                firstName = firstName,
-                lastName = _lastName.value.trim().takeIf { it.isNotEmpty() },
+                fullName = firstName,
                 email = _email.value.trim().takeIf { it.isNotEmpty() && isValidEmail(it) }
             )
             

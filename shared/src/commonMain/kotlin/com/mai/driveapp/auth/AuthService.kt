@@ -87,16 +87,14 @@ class AuthService(private val apiClient: ApiClient) {
     suspend fun completeRegistration(
         userId: String,
         phoneNumber: String,
-        firstName: String,
-        lastName: String? = null,
+        fullName: String,
         email: String? = null
     ): Result<CompleteRegistrationResponse> {
         return try {
             val request = CompleteRegistrationRequest(
                 userId = userId,
                 phoneNumber = phoneNumber,
-                firstName = firstName,
-                lastName = lastName,
+                fullName = fullName,
                 email = email
             )
             

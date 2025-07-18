@@ -50,21 +50,10 @@ class VerificationViewModel(private val authRepository: AuthRepository) : ViewMo
                 
                 result.fold(
                     onSuccess = { requiresRegistration ->
-                        // در صورت موفقیت، همیشه وضعیت Success را تنظیم می‌کنیم
                         _uiState.value = VerificationUiState.Success
-                        
-                        // همیشه پرچم انتقال به صفحه ثبت‌نام را فعال می‌کنیم
-                        // بدون توجه به پاسخ سرور، چون نیاز به ثبت‌نام داریم
-                        _shouldNavigateToRegistration.value = true
-                        
-                        // برای اطمینان از انتقال کاربر به صفحه ثبت‌نام، یک تایمر تأخیر
-                        // می‌گذاریم و بعد دوباره پرچم را فعال می‌کنیم
-                        viewModelScope.launch {
-                            kotlinx.coroutines.delay(1000)
-                            if (_uiState.value is VerificationUiState.Success) {
-                                _shouldNavigateToRegistration.value = true
-                            }
-                        }
+                        println("[VerificationViewModel] requiresRegistration=$requiresRegistration")
+                        // Only navigate to registration if required
+                        _shouldNavigateToRegistration.value = requiresRegistration
                     },
                     onFailure = { error ->
                         _uiState.value = VerificationUiState.Error(error.message ?: "خطایی رخ داد. لطفاً دوباره تلاش کنید.")

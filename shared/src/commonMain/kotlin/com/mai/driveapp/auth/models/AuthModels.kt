@@ -45,8 +45,7 @@ data class VerifyCodeResponse(
 data class CompleteRegistrationRequest(
     val userId: String,
     val phoneNumber: String,
-    val firstName: String,
-    val lastName: String? = null,
+    val fullName: String,
     val email: String? = null
 )
 

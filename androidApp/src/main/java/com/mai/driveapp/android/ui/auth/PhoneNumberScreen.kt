@@ -27,6 +27,12 @@ import com.mai.driveapp.android.LocalLanguageManager
 import com.mai.driveapp.android.LocalizedStrings
 import com.mai.driveapp.android.LanguageSelectorModal
 
+// Constants moved outside composable to prevent recreations
+private val spacerHeight24 = 24.dp
+private val buttonHeight = 50.dp
+private val iconSize = 24.dp
+private val strokeWidth = 2.dp
+
 @Composable
 fun PhoneNumberScreen(
     viewModel: PhoneNumberViewModel = koinViewModel(),
@@ -35,27 +41,29 @@ fun PhoneNumberScreen(
     val uiState by viewModel.uiState.collectAsState()
     val phoneNumber by viewModel.phoneNumber.collectAsState()
     val userType by viewModel.userType.collectAsState()
-
+    
     var showNotification by remember { mutableStateOf(false) }
     var notificationMessage by remember { mutableStateOf("") }
     var showLanguageSelector by remember { mutableStateOf(false) }
-
-    // Access language manager
+    
+    // Access language manager - read only once and store in a stable reference
     val languageManager = LocalLanguageManager.current
     val currentLanguage by languageManager.languageState
-
-    // Determine text alignment and direction based on language
-    val textAlign = if (currentLanguage.isRtl) TextAlign.Right else TextAlign.Left
-    val textDirection = if (currentLanguage.isRtl) TextDirection.Rtl else TextDirection.Ltr
-
+    
+    // Calculate text properties once based on language
+    val isRtl = currentLanguage.isRtl
+    val textAlign = if (isRtl) TextAlign.Right else TextAlign.Left
+    val textDirection = if (isRtl) TextDirection.Rtl else TextDirection.Ltr
+    val isPersian = currentLanguage == Language.PERSIAN
+ 
     // User type label for the main button (dynamic last word)
     val userTypeLabel = when (userType) {
-        "passenger" -> if (currentLanguage == Language.PERSIAN) "مسافر" else "Passenger"
-        "driver" -> if (currentLanguage == Language.PERSIAN) "مسافربر و راننده" else "Driver"
-        else -> if (currentLanguage == Language.PERSIAN) "مسافر" else "Passenger"
+        "passenger" -> if (isPersian) "مسافر" else "Passenger"
+        "driver" -> if (isPersian) "مسافربر و راننده" else "Driver"
+        else -> if (isPersian) "مسافر" else "Passenger"
     }
-
-    // Show notification when verification code is received
+    
+    // Process UI state changes in a focused effect
     LaunchedEffect(uiState) {
         when (uiState) {
             is PhoneNumberUiState.Success -> {
@@ -73,14 +81,23 @@ fun PhoneNumberScreen(
             }
         }
     }
-
+    
+    // Text content based on language - calculate once to avoid recompositions
+    val headerText = if (isPersian) "خوش آمدید!" else "Welcome!"
+    val subHeaderText = if (isPersian) 
+        "لطفاً شماره موبایلی را وارد کنید که مسافربر یا راننده از طریق آن با شما در تماس یا هماهنگ باشد"
+    else 
+        "Please enter the phone number that the driver or passenger can use to contact or coordinate with you."
+    val phoneLabel = if (isPersian) "شماره تلفن" else "Phone Number"
+    val buttonText = if (isPersian) "ورود بعنوان $userTypeLabel" else "Login as $userTypeLabel"
+    
+    // Main content
     Box(modifier = Modifier.fillMaxSize()) {
-        // Main content
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .statusBarsPadding(), // Add status bar padding to avoid overlap
+                .statusBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -103,30 +120,27 @@ fun PhoneNumberScreen(
                     )
                 }
             }
-
+            
             // Header
             Text(
-                text = if (currentLanguage == Language.PERSIAN) "خوش آمدید!" else "Welcome!",
+                text = headerText,
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 32.dp, bottom = 24.dp)
             )
-
+            
             Text(
-                text = if (currentLanguage == Language.PERSIAN)
-                    "لطفاً شماره موبایلی را وارد کنید که مسافربر یا راننده از طریق آن با شما در تماس یا هماهنگ باشد"
-                else
-                    "Please enter the phone number that the driver or passenger can use to contact or coordinate with you.",
+                text = subHeaderText,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
-
+            
             // Phone number input with RTL support
             OutlinedTextField(
                 value = phoneNumber,
                 onValueChange = { viewModel.updatePhoneNumber(it) },
-                label = { Text(if (currentLanguage == Language.PERSIAN) "شماره تلفن" else "Phone Number") },
+                label = { Text(phoneLabel) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 singleLine = true,
                 textStyle = LocalTextStyle.current.copy(
@@ -135,50 +149,48 @@ fun PhoneNumberScreen(
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
+            
+            Spacer(modifier = Modifier.height(spacerHeight24))
+            
             // Submit button
             Button(
                 onClick = { viewModel.submitPhoneNumber() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(buttonHeight),
                 enabled = uiState !is PhoneNumberUiState.Loading
             ) {
                 if (uiState is PhoneNumberUiState.Loading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(iconSize),
                         color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 2.dp
+                        strokeWidth = strokeWidth
                     )
                 } else {
                     Text(
-                        if (currentLanguage == Language.PERSIAN)
-                            "ورود بعنوان $userTypeLabel"
-                        else
-                            "Login as $userTypeLabel",
+                        text = buttonText,
                         style = MaterialTheme.typography.titleLarge
                     )
                 }
             }
 
-            // User type selection as small clickable text below the button
+            // User type selection
             UserTypeSelector(
                 selectedUserType = userType,
                 onUserTypeSelected = { viewModel.setUserType(it) }
             )
         }
-
-        // Language selector modal
-        LanguageSelectorModal(
-            isVisible = showLanguageSelector,
-            onDismiss = { showLanguageSelector = false },
-            currentLanguage = currentLanguage,
-            onLanguageSelected = { languageManager.setLanguage(it) }
-        )
-
-        // Notification
+        
+        // Show modals conditionally to avoid unnecessary compositions
+        if (showLanguageSelector) {
+            LanguageSelectorModal(
+                isVisible = true,
+                onDismiss = { showLanguageSelector = false },
+                currentLanguage = currentLanguage,
+                onLanguageSelected = { languageManager.setLanguage(it) }
+            )
+        }
+        
         if (showNotification) {
             NotificationCard(
                 message = notificationMessage,
@@ -193,19 +205,25 @@ fun UserTypeSelector(
     selectedUserType: String,
     onUserTypeSelected: (String) -> Unit
 ) {
+    // Access language manager
     val languageManager = LocalLanguageManager.current
     val currentLanguage by languageManager.languageState
-
+    val isPersian = currentLanguage == Language.PERSIAN
+    
     val alternateUserType = if (selectedUserType == "passenger") "driver" else "passenger"
     val alternateUserTypeLabel = if (alternateUserType == "passenger") {
-        if (currentLanguage == Language.PERSIAN) "مسافر" else "Passenger"
+        if (isPersian) "مسافر" else "Passenger"
     } else {
-        if (currentLanguage == Language.PERSIAN) "مسافربر و راننده" else "Driver"
+        if (isPersian) "مسافربر و راننده" else "Driver"
     }
 
+    val loginText = if (isPersian) "ورود" else "Login"
+    val asText = if (isPersian) " به عنوان $alternateUserTypeLabel" else " as $alternateUserTypeLabel"
+    
+    // Create the annotated string directly - don't wrap in remember with composable functions
     val annotatedText = buildAnnotatedString {
         withStyle(style = SpanStyle(fontSize = 18.sp)) {
-            append(if (currentLanguage == Language.PERSIAN) "ورود" else "Login")
+            append(loginText)
         }
         withStyle(
             style = SpanStyle(
@@ -214,7 +232,7 @@ fun UserTypeSelector(
                 fontSize = 18.sp
             )
         ) {
-            append(if (currentLanguage == Language.PERSIAN) " به عنوان $alternateUserTypeLabel" else " as $alternateUserTypeLabel")
+            append(asText)
         }
     }
 

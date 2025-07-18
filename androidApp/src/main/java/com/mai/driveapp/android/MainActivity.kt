@@ -35,8 +35,19 @@ class MainActivity : ComponentActivity() {
         sessionManager = inject<SessionManager>().value
         
         setContent {
+            // Collect states once at the top level and pass down as parameters
+            // This avoids multiple downstream recompositions
             val isLoggedIn by sessionManager.isLoggedIn.collectAsState()
             val needsRegistration by sessionManager.needsRegistration.collectAsState()
+            
+            // Stable references to callbacks
+            val onLogout = remember {
+                { sessionManager.logout() }
+            }
+            
+            val onAuthComplete = remember {
+                { sessionManager.completeRegistration() }
+            }
             
             // Provide the language manager to the composition
             ProvideLanguageManager {
@@ -45,22 +56,15 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
+                        // Single decision point for navigation
                         if (isLoggedIn && !needsRegistration) {
                             // User is fully logged in, show main app
-                            MainNavGraph(
-                                onLogout = {
-                                    sessionManager.logout()
-                                }
-                            )
+                            MainNavGraph(onLogout = onLogout)
                         } else {
                             // User needs authentication or registration completion
                             AuthNavGraph(
                                 sessionManager = sessionManager,
-                                onAuthenticationComplete = {
-                                    // این تابع فقط زمانی صدا زده می‌شود که کاربر کاملاً ثبت‌نام کرده باشد
-                                    // اطمینان حاصل می‌کنیم که فرآیند ثبت‌نام کامل شده است
-                                    sessionManager.completeRegistration()
-                                }
+                                onAuthenticationComplete = onAuthComplete
                             )
                         }
                     }

@@ -232,4 +232,101 @@ object LocalizedStrings {
             Language.PERSIAN -> "ثبت"
             Language.ENGLISH -> "Apply"
         }
+
+    // Verification screen strings
+    val verificationTitle: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "تایید شماره تلفن"
+            Language.ENGLISH -> "Verify Phone Number"
+        }
+
+    val verificationSubtitle: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "کد تایید ارسال شده را وارد کنید"
+            Language.ENGLISH -> "Enter the verification code sent to you"
+        }
+
+    val changeNumber: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "تغییر شماره"
+            Language.ENGLISH -> "Change Number"
+        }
+
+    val submitCode: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "تایید کد"
+            Language.ENGLISH -> "Submit Code"
+        }
+
+    @Composable
+    @ReadOnlyComposable
+    fun resendCodeIn(seconds: Int): String = when(currentLanguage()) {
+        Language.PERSIAN -> "ارسال مجدد کد در $seconds ثانیه"
+        Language.ENGLISH -> "Resend code in $seconds seconds"
+    }
+
+    // Registration screen strings
+    val registrationTitle: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "تکمیل اطلاعات کاربری"
+            Language.ENGLISH -> "Complete Profile Information"
+        }
+
+    val enterNameInstruction: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "لطفاً نام خود را وارد کنید"
+            Language.ENGLISH -> "Please enter your first name"
+        }
+
+    val firstNameLabel: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "نام*"
+            Language.ENGLISH -> "First Name*"
+        }
+
+    val lastNameLabel: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "نام خانوادگی"
+            Language.ENGLISH -> "Last Name"
+        }
+
+    val emailOptionalLabel: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "ایمیل (اختیاری)"
+            Language.ENGLISH -> "Email (Optional)"
+        }
+
+    val submitInfo: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "ثبت اطلاعات"
+            Language.ENGLISH -> "Submit"
+        }
+
+    val requiredFieldMark: String
+        @Composable
+        @ReadOnlyComposable
+        get() = when(currentLanguage()) {
+            Language.PERSIAN -> "* فیلد الزامی"
+            Language.ENGLISH -> "* Required field"
+        }
 } 

@@ -10,12 +10,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mai.driveapp.Language
+
+// Fixed dimensions to prevent recreations
+private val topPadding = 16.dp
+private val topCornerRadius = 16.dp
+private val headerFontSize = 20.sp
+private val closeFontSize = 24.sp
+private val verticalPadding = 24.dp
+private val cardVerticalPadding = 4.dp
+private val rowPadding = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
+private val buttonHeight = 56.dp
+private val buttonFontSize = 18.sp
+private val titleFontSize = 18.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,9 +40,13 @@ fun LanguageSelectorModal(
         // Use temporary state for language selection
         var selectedLanguage by remember { mutableStateOf(currentLanguage) }
         
+        // Retrieve static texts to avoid recompositions
+        val saveText = LocalizedStrings.save
+        val languageSelectionTitle = LocalizedStrings.languageSelection
+        
         ModalBottomSheet(
             onDismissRequest = onDismiss,
-            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            shape = RoundedCornerShape(topStart = topCornerRadius, topEnd = topCornerRadius),
             containerColor = MaterialTheme.colorScheme.surface,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -47,27 +62,27 @@ fun LanguageSelectorModal(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Close icon - hidden for now
+                    // Placeholder for layout balance
                     Spacer(Modifier.width(24.dp))
                     
-                    // Title
+                    // Title - stable reference
                     Text(
-                        text = LocalizedStrings.languageSelection,
-                        fontSize = 20.sp,
+                        text = languageSelectionTitle,
+                        fontSize = headerFontSize,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f)
                     )
                     
-                    // Close button
+                    // Close button - minimize allocations
                     IconButton(onClick = onDismiss) {
-                        Text("✕", fontSize = 24.sp)
+                        Text("✕", fontSize = closeFontSize)
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(verticalPadding))
                 
-                // Language options
+                // Language options - use remember for stable references
                 LanguageOption(
                     language = Language.ENGLISH,
                     isSelected = selectedLanguage == Language.ENGLISH,
@@ -82,7 +97,7 @@ fun LanguageSelectorModal(
                     onSelect = { selectedLanguage = Language.PERSIAN }
                 )
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(verticalPadding))
                 
                 // Submit button
                 Button(
@@ -93,14 +108,14 @@ fun LanguageSelectorModal(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(buttonHeight),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Text(
-                        text = LocalizedStrings.save,
-                        fontSize = 18.sp
+                        text = saveText,
+                        fontSize = buttonFontSize
                     )
                 }
                 
@@ -116,27 +131,30 @@ fun LanguageOption(
     isSelected: Boolean,
     onSelect: () -> Unit
 ) {
-    // Make entire row clickable
+    // Make entire row clickable and stable
+    val backgroundColor = if (isSelected) 
+        MaterialTheme.colorScheme.surfaceVariant 
+    else 
+        MaterialTheme.colorScheme.surface
+        
     Card(
         onClick = onSelect,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = cardVerticalPadding),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.surfaceVariant 
-                            else MaterialTheme.colorScheme.surface
+            containerColor = backgroundColor
         )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 16.dp),
+            modifier = rowPadding
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = language.displayName,
-                fontSize = 18.sp
+                fontSize = titleFontSize
             )
             
             RadioButton(

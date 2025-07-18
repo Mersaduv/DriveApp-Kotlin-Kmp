@@ -27,6 +27,7 @@ import com.mai.driveapp.auth.viewmodels.RegistrationUiState
 import com.mai.driveapp.auth.viewmodels.RegistrationViewModel
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import com.mai.driveapp.android.LocalizedStrings
 
 @Composable
 fun RegistrationScreen(
@@ -93,7 +94,7 @@ fun RegistrationScreen(
             
             // Header
             Text(
-                text = "تکمیل اطلاعات کاربری",
+                text = LocalizedStrings.registrationTitle,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -102,7 +103,7 @@ fun RegistrationScreen(
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(
-                text = "لطفاً نام خود را وارد کنید",
+                text = LocalizedStrings.enterNameInstruction,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp)
@@ -114,7 +115,7 @@ fun RegistrationScreen(
             OutlinedTextField(
                 value = firstName,
                 onValueChange = { viewModel.updateFirstName(it) },
-                label = { Text("نام*") },
+                label = { Text(LocalizedStrings.firstNameLabel) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -132,7 +133,7 @@ fun RegistrationScreen(
             OutlinedTextField(
                 value = lastName,
                 onValueChange = { viewModel.updateLastName(it) },
-                label = { Text("نام خانوادگی") },
+                label = { Text(LocalizedStrings.lastNameLabel) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -149,7 +150,7 @@ fun RegistrationScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { viewModel.updateEmail(it) },
-                label = { Text("ایمیل (اختیاری)") },
+                label = { Text(LocalizedStrings.emailOptionalLabel) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -184,7 +185,7 @@ fun RegistrationScreen(
                     )
                 } else {
                     Text(
-                        "ثبت اطلاعات",
+                        LocalizedStrings.submitInfo,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -194,7 +195,7 @@ fun RegistrationScreen(
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(
-                text = "* فیلد الزامی",
+                text = LocalizedStrings.requiredFieldMark,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Start,
                 modifier = Modifier
